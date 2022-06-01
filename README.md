@@ -1,2 +1,2 @@
 # tools
-Assorted things I wrote for CTF's or other private enjoyments.
+Assorted tools I wrote for CTF's or other private enjoyments.
