@@ -15,15 +15,28 @@
 import pefile
 import argparse
 
+# set up parser and populate arguments...
 parser = argparse.ArgumentParser(description='Write exports of a target DLL to a file.')
-parser.add_argument('--target', required=True, type=str, help='Target WINDOWS DLL.')
-parser.add_argument('--originalPath', required=True, type=str, help='Original (Windows) DLL path.')
+parser.add_argument(
+    '--target',
+    required=True,
+    type=str,
+    help='Target WINDOWS DLL.'
+)
+parser.add_argument(
+    '--originalPath',
+    required=True,
+    type=str,
+    help='Original (Windows) DLL path.'
+)
 
-args = parser.parse_args()
+# now parse cmdline...
+parsed_args = parser.parse_args()
+# initialize variables and clean up originalPath while we're at it...
+target = parsed_args.target
+original_path = parsed_args.originalPath.replace('\\', '/')
 
-target = args.target
-original_path = args.originalPath.replace('\\','/')
-
+# Since target is a Portable Executable (PE), use module pefile to parse...
 dll = pefile.PE(target)
 
 print("EXPORTS", end="\r\n")
