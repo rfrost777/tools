@@ -6,8 +6,8 @@ import argparse
 import base64
 
 MODE = {
-    "de": "decode",
-    "en": "encode"
+    "dec": "decode",
+    "enc": "encode"
 }
 
 if __name__ == '__main__':
@@ -33,7 +33,7 @@ if __name__ == '__main__':
     # parse arguments
     parsed_args = parser.parse_args()
 
-    if parsed_args.mode == "en":
+    if parsed_args.mode == "enc":
         if parsed_args.safe:
             result = base64.urlsafe_b64encode(bytes(parsed_args.inputstring, "utf-8"))
         else:
