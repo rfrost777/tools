@@ -3,6 +3,9 @@
 # content. Used for picoCTF MOD26 challenge.
 # I KNOW there is a function for this in codecs,
 # but where is the fun in that?
+#
+# 17-08-2022:   Added ROT47 function for use in the
+#               THM Overpass room.
 ###################################################
 import sys
 
@@ -23,6 +26,19 @@ def rot13elegant(phrase):
         for i in range(26):
             d[chr(i+character)] = chr((i+13) % 26 + character)
     return ''.join([d.get(character, character) for character in phrase])
+
+
+def rot47elegant(phrase):
+    x = []
+    # I use basically the same trick as in rot13elegant(), check if phrase[i] is a printable
+    # ASCII character, if yes then shift it, this time 47 "places"...
+    for i in range(len(phrase)):
+        j = ord(phrase[i])
+        if 33 <= j <= 126:
+            x.append(chr(33 + ((j+14) % 94)))
+        else:
+            x.append(phrase[i])
+    return ''.join(x)
 
 
 if len(sys.argv) != 2:
