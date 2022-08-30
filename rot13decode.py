@@ -29,16 +29,16 @@ def rot13elegant(phrase):
 
 
 def rot47elegant(phrase):
-    x = []
-    # I use basically the same trick as in rot13elegant(), check if phrase[i] is a printable
+    d = []
+    # I basically use the same trick as in rot13elegant(), check if phrase[i] is a printable
     # ASCII character, if yes then shift it, this time 47 "places"...
     for i in range(len(phrase)):
         j = ord(phrase[i])
         if 33 <= j <= 126:
-            x.append(chr(33 + ((j+14) % 94)))
+            d.append(chr(33 + ((j+14) % 94)))
         else:
-            x.append(phrase[i])
-    return ''.join(x)
+            d.append(phrase[i])
+    return ''.join(d)
 
 
 if len(sys.argv) != 2:
@@ -46,6 +46,7 @@ if len(sys.argv) != 2:
 else:
     print(f"Original string is: {sys.argv[1]}\n")
 
-    # This works both ways because ROT13 is mathematically an involution.
+    # This works both ways because ROT13/47 is mathematically an involution.
     print(f"* Encoded/decoded string is: {rot13hardcoded(sys.argv[1])}\n")
-    print(f"* More elegant encoded: {rot13elegant(sys.argv[1])}\n")
+    print(f"* More elegant encoded: {rot13elegant(sys.argv[1])}\n\n")
+    print(f"* ROT47 en-/decoded should be: {rot47elegant(sys.argv[1])}\n")
