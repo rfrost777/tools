@@ -40,7 +40,7 @@ Usage:
 A CTF challenge written in Rockstar. Yeah, I know. That's really a thing. Roll with it...
 
 
-## rot13decode.py
+## rot_encode.py
 10 ways of encoding/decoding a string in ROT13 without using python library's. Okay I could only think of two
 ways right now. *TODO*: Maybe add some more ways later?
 
