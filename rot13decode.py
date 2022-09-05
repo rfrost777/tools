@@ -4,8 +4,8 @@
 # I KNOW there is a function for this in codecs,
 # but where is the fun in that?
 #
-# 17-08-2022:   Added ROT47 function for use in the
-#               THM Overpass room.
+# 17-08-2022:   Added a ROT47 function for use in
+#               the THM Overpass room.
 ###################################################
 import sys
 
@@ -14,6 +14,8 @@ def rot13hardcoded(phrase):
     # Let's hardcode a transformation scheme:
     key = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
     crypt = "nopqrstuvwxyzabcdefghijklmNOPQRSTUVWXYZABCDEFGHIJKLM"
+    # with import string: key = string.ascii_letters; crypt = key[13:] + key[:13]
+    # but let's limit our self's to pure build-in functions ;)
     transform = dict(zip(key, crypt))
     # Transform every character accordingly!
     return ''.join(transform.get(char, char) for char in phrase)
@@ -46,7 +48,7 @@ if len(sys.argv) != 2:
 else:
     print(f"Original string is: {sys.argv[1]}\n")
 
-    # This works both ways because ROT13/47 is mathematically an involution.
+    # This works both ways because ROT13/47 are mathematically an involution.
     print(f"* Encoded/decoded string is: {rot13hardcoded(sys.argv[1])}\n")
     print(f"* More elegant encoded: {rot13elegant(sys.argv[1])}\n\n")
     print(f"* ROT47 en-/decoded should be: {rot47elegant(sys.argv[1])}\n")
