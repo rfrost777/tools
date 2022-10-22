@@ -15,32 +15,38 @@
 import pefile
 import argparse
 
-# set up parser and populate arguments...
-parser = argparse.ArgumentParser(description='Write exports of a target DLL to a file.')
-parser.add_argument(
-    '--target',
-    required=True,
-    type=str,
-    help='Target WINDOWS DLL.'
-)
-parser.add_argument(
-    '--originalPath',
-    required=True,
-    type=str,
-    help='Original (Windows) DLL path.'
-)
 
-# now parse cmdline...
-parsed_args = parser.parse_args()
-# initialize variables and clean up originalPath while we're at it...
-target = parsed_args.target
-original_path = parsed_args.originalPath.replace('\\', '/')
+def main():
+    # set up parser and populate arguments...
+    parser = argparse.ArgumentParser(description='Write exports of a target DLL to a file.')
+    parser.add_argument(
+        '--target',
+        required=True,
+        type=str,
+        help='Target WINDOWS DLL.'
+    )
+    parser.add_argument(
+        '--originalPath',
+        required=True,
+        type=str,
+        help='Original (Windows) DLL path.'
+    )
 
-# Since target is a Portable Executable (PE), use module pefile to parse...
-dll = pefile.PE(target)
+    # now parse cmdline...
+    parsed_args = parser.parse_args()
+    # initialize variables and clean up originalPath while we're at it...
+    target = parsed_args.target
+    original_path = parsed_args.originalPath.replace('\\', '/')
 
-print("EXPORTS", end="\r\n")
+    # Since target is a Portable Executable (PE), use module pefile to parse...
+    dll = pefile.PE(target)
 
-for export in dll.DIRECTORY_ENTRY_EXPORT.symbols:
-    if export.name:
-        print(f"    {export.name.decode()}={original_path}.{export.name.decode()} @{export.ordinal}", end="\r\n")
+    print("EXPORTS", end="\r\n")
+
+    for export in dll.DIRECTORY_ENTRY_EXPORT.symbols:
+        if export.name:
+            print(f"    {export.name.decode()}={original_path}.{export.name.decode()} @{export.ordinal}", end="\r\n")
+
+
+if __name__ == '__main__':
+    main()
