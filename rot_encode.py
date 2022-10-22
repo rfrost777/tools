@@ -43,12 +43,17 @@ def rot47elegant(phrase: str) -> str:
     return ''.join(d)
 
 
-if len(sys.argv) != 2:
-    print(f"Usage: {sys.argv[0]} '<your text to encode or decode>'\n")
-else:
-    print(f"Original string is: {sys.argv[1]}\n")
+def main():
+    if len(sys.argv) != 2:
+        print(f"Usage: {sys.argv[0]} '<your text to encode or decode>'\n")
+    else:
+        print(f"Original string is: {sys.argv[1]}\n")
 
     # This works both ways because ROT13/47 are mathematically involutions.
     print(f"* Encoded/decoded string is: {rot13hardcoded(sys.argv[1])}\n")
     print(f"* More elegant encoded: {rot13elegant(sys.argv[1])}\n\n")
     print(f"* ROT47 en-/decoded should be: {rot47elegant(sys.argv[1])}\n")
+
+
+if __name__ == "__main__":
+    main();
