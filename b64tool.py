@@ -5,12 +5,13 @@
 import argparse
 import base64
 
-MODE = {
-    "dec": "decode",
-    "enc": "encode"
-}
 
-if __name__ == '__main__':
+def main():
+    MODE = {
+        "dec": "decode",
+        "enc": "encode"
+    }
+
     # set up parser and populate arguments...
     parser = argparse.ArgumentParser(description="Encode or decode base64.")
     parser.add_argument(
@@ -46,3 +47,7 @@ if __name__ == '__main__':
             result = base64.b64decode(bytes(parsed_args.inputstring, "utf-8"))
 
     print(f"Here's what I got: {result.decode()}")
+
+
+if __name__ == '__main__':
+    main()
