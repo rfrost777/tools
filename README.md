@@ -41,11 +41,11 @@ A CTF challenge written in Rockstar. Yeah, I know. That's really a thing. Roll w
 
 
 ## rot_encode.py
-10 ways of encoding/decoding a string in ROT13 without using python library's. Okay I could only think of two
+10 ways of encoding/decoding a string in ROT13/47 without using python library's. Okay I could only think of two
 ways right now. *TODO*: Maybe add some more ways later?
 
 Usage:
-`python3 rot13decode.py <Your Text here>`
+`python3 rot_encode.py <Your Text here>`
 
 
 ## zerologon.py
@@ -55,3 +55,10 @@ https://raw.githubusercontent.com/SecuraBV/CVE-2020-1472/master/zerologon_tester
 
 Usage:
 `python3 zerologon.py <dc-name> <dc-ip>`
+
+
+## portscan.py
+Simple TCP Portscanner. *TODO*: Make it more useful. 
+
+Usage:
+`python3 portscan.py`
