@@ -6,13 +6,15 @@
 import sys
 import os.path
 
-if not (1 < len(sys.argv) <= 2):
-    # something seems off, better print out usage and exit nonzero
-    print(f"Usage: {sys.argv[0]} <filename> to decode the ASCII contents of filename.\n")
-    sys.exit(1)
-else:
-    # looks good, get the argument(s) from argv
-    [_, f_name] = sys.argv
+
+def main():
+    if not (1 < len(sys.argv) <= 2):
+        # something seems off, better print out usage and exit nonzero
+        print(f"Usage: {sys.argv[0]} <filename> to decode the ASCII contents of filename.\n")
+        sys.exit(1)
+    else:
+        # looks good, get the argument(s) from argv
+        [_, f_name] = sys.argv
 
     # check if argument is a path to an existing file, else print an error
     if os.path.isfile(f_name):
@@ -25,3 +27,7 @@ else:
     else:
         print(f"File: {f_name} does not exist. Nothing to do.\n")
         sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()

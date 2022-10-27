@@ -1,14 +1,13 @@
 import sys
 import socket
 
-
 ip_address = '10.10.146.215'
 open_ports = []
 
 ports = range(1, 65535)
 
 
-def test_port(ip, probe_port, result=1):
+def test_port(ip: str, probe_port: int, result=1) -> int:
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(0.5)
@@ -29,7 +28,7 @@ for port in ports:
     
 
 if open_ports: 
-    print ("Open Ports are: ")
-    print (sorted(open_ports))
+    print("Open Ports are: ")
+    print(sorted(open_ports))
 else: 
-    print ("Looks like no ports are open :(")
+    print("Looks like no ports are open :(")
