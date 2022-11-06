@@ -58,7 +58,14 @@ Usage:
 
 
 ## portscan.py
-Simple TCP Portscanner. *TODO*: Make it more useful. 
+Simple TCP Portscanner. *TODO*: Make it more useful.
 
 Usage:
 `python3 portscan.py`
+
+
+## shellcode_dropper.cpp
+A simple Win64 shellcode dropper template that tries to take an educated guess if it's run in a sandboxed environment.
+Downloads and executes a raw msfvenom tcp reverse_shell payload from a C2 server if not. I used this in the TryHackMe
+Room: Sandbox Evasion. For educational purposes only!
+*TODO*: Add more (elaborate) sandbox checks to refine the guess.
