@@ -20,15 +20,19 @@ def test_port(ip: str, probe_port: int, result=1) -> int:
     return result
 
 
-for port in ports: 
-    sys.stdout.flush() 
-    response = test_port(ip_address, port)
-    if response == 0: 
-        open_ports.append(port) 
-    
+def main():
+    for port in ports:
+        sys.stdout.flush()
+        response = test_port(ip_address, port)
+        if response == 0:
+            open_ports.append(port)
 
-if open_ports: 
-    print("Open Ports are: ")
-    print(sorted(open_ports))
-else: 
-    print("Looks like no ports are open :(")
+    if open_ports:
+        print("Open Ports are: ")
+        print(sorted(open_ports))
+    else:
+        print("Looks like no ports are open :(")
+
+
+if __name__ == '__main__':
+    main()
