@@ -1,10 +1,14 @@
+################################################################
+# portscan.py
+#               - Simple python port scanner -
+################################################################
 import sys
 import socket
+from time import time
 
-ip_address = '10.10.146.215'
-open_ports = []
-
-ports = range(1, 65535)
+# Setup target IP and port range here:
+ip_address = '127.0.0.1'
+ports = range(1, 1000)
 
 
 def test_port(ip: str, probe_port: int, result=1) -> int:
@@ -21,6 +25,9 @@ def test_port(ip: str, probe_port: int, result=1) -> int:
 
 
 def main():
+    open_ports = []
+    time_start = time()
+
     for port in ports:
         sys.stdout.flush()
         response = test_port(ip_address, port)
@@ -28,10 +35,12 @@ def main():
             open_ports.append(port)
 
     if open_ports:
-        print("Open Ports are: ")
+        print(f"Open Ports in {ports} are: ")
         print(sorted(open_ports))
     else:
         print("Looks like no ports are open :(")
+
+    print(f"\n*DEBUG* Execution time was: {time() - time_start} seconds.")
 
 
 if __name__ == '__main__':
