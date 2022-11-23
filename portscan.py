@@ -4,11 +4,8 @@
 ################################################################
 import sys
 import socket
+import argparse
 from time import time
-
-# Setup target IP and port range here:
-ip_address = '127.0.0.1'
-ports = range(1, 1000)
 
 
 def test_port(ip: str, probe_port: int, result=1) -> int:
@@ -26,11 +23,38 @@ def test_port(ip: str, probe_port: int, result=1) -> int:
 
 def main():
     open_ports = []
-    time_start = time()
+
+    # Set up a parser and populate the arguments...
+    parser = argparse.ArgumentParser(description="Simple Portscanner Version 0.1")
+    parser.add_argument(
+        "ip_address",
+        type=str,
+        help="Target IP address to scan."
+    )
+    parser.add_argument(
+        "max_port",
+        type=int,
+        help="Scan ports from 1 to max_port."
+    )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        dest="debug",
+        help="Print additional information useful for performance testing."
+    )
+    # Parse arguments.
+    parsed_args = parser.parse_args()
+    # Set up port range.
+    ports = range(1, parsed_args.max_port)
+
+    if parsed_args.debug:
+        # DEBUG? Remember start time.
+        time_start = time()
 
     for port in ports:
+        # Check all ports in range.
         sys.stdout.flush()
-        response = test_port(ip_address, port)
+        response = test_port(parsed_args.ip_address, port)
         if response == 0:
             open_ports.append(port)
 
@@ -40,7 +64,9 @@ def main():
     else:
         print("Looks like no ports are open :(")
 
-    print(f"\n*DEBUG* Execution time was: {time() - time_start} seconds.")
+    if parsed_args.debug:
+        # DEBUG? Print out the time difference between now and start.
+        print(f"\n[+] Execution time was about: {time() - time_start} seconds.")
 
 
 if __name__ == '__main__':
