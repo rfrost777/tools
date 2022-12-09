@@ -16,7 +16,8 @@ def test_port(ip: str, probe_port: int, result=1) -> int:
         if r == 0:
             result = r
         sock.close()
-    except Exception as e:
+    except socket.error as e:
+        # only catching socket errors here is probably better practice!
         pass
     return result
 

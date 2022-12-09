@@ -7,7 +7,7 @@ import base64
 
 
 def main():
-    MODE = {
+    mode = {
         "dec": "decode",
         "enc": "encode"
     }
@@ -17,7 +17,7 @@ def main():
     parser.add_argument(
         "mode",
         type=str,
-        choices=MODE.keys(),
+        choices=mode.keys(),
         help="Mode of operation."
     )
     parser.add_argument(
