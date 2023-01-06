@@ -58,10 +58,12 @@ Usage:
 
 
 ## portscan.py
-Simple TCP Portscanner. *TODO*: Make it more useful.
+Simple TCP Portscanner that scans ports from 1 to max_port. 
+Added: --debug switch for benchmarking purposes.
+*TODO*: Make it more useful. Maybe increase efficiency?
 
 Usage:
-`python3 portscan.py`
+`python3 portscan.py [-h] [--debug] <ip_address> <max_port>`
 
 
 ## shellcode_dropper.cpp
