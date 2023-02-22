@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 ################################################################
 # portscan.py
 #               - Simple python port scanner -
@@ -16,7 +17,7 @@ def test_port(ip: str, probe_port: int, result=1) -> int:
         if r == 0:
             result = r
         sock.close()
-    except socket.error as e:
+    except socket.error:
         # only catching socket errors here is probably better practice!
         pass
     return result
@@ -49,7 +50,7 @@ def main():
     ports = range(1, parsed_args.max_port)
 
     if parsed_args.debug:
-        # DEBUG? Remember start time.
+        # DEBUG flag set? Remember start time.
         time_start = time()
 
     for port in ports:
