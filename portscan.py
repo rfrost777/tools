@@ -1,26 +1,27 @@
 #!/usr/bin/env python3
 ################################################################
 # portscan.py
-#               - Simple python port scanner -
+#               - Simple Python port scanner -
 ################################################################
 import sys
 import socket
 import argparse
-from time import time
+import time
 
 
-def test_port(ip: str, probe_port: int, result=1) -> int:
+def test_port(ip: str, port: int, open_ports: list):
     try:
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         sock.settimeout(0.5)
-        r = sock.connect_ex((ip, probe_port))
-        if r == 0:
-            result = r
+        result = sock.connect_ex((ip, port))
+        if result == 0:
+            # Port is open, so append to list...
+            open_ports.append(port)
         sock.close()
     except socket.error:
         # only catching socket errors here is probably better practice!
         pass
-    return result
+# === EMD def test_port ===
 
 
 def main():
@@ -48,27 +49,26 @@ def main():
     parsed_args = parser.parse_args()
     # Set up port range.
     ports = range(1, parsed_args.max_port)
-
-    if parsed_args.debug:
-        # DEBUG flag set? Remember start time.
-        time_start = time()
+    # Save start time.
+    time_start = time.perf_counter()
 
     for port in ports:
         # Check all ports in range.
         sys.stdout.flush()
-        response = test_port(parsed_args.ip_address, port)
-        if response == 0:
-            open_ports.append(port)
+        test_port(parsed_args.ip_address, port, open_ports)
 
     if open_ports:
-        print(f"Open Ports in {ports} are: ")
+        print(f"Open Ports in {ports} found: ")
         print(sorted(open_ports))
     else:
-        print("Looks like no ports are open :(")
+        print("Looks like we found no open ports :(")
 
+    # Save end time.
+    time_end = time.perf_counter()
     if parsed_args.debug:
-        # DEBUG? Print out the time difference between now and start.
-        print(f"\n[+] Execution time was about: {time() - time_start} seconds.")
+        # DEBUG? Print out the time difference between end and start in seconds.
+        print(f"\n[+] Execution time was about: {round(time_end - time_start, 2)} seconds.")
+# === END def main ===
 
 
 if __name__ == '__main__':
