@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+########################################################
+# date_gen.py -
+# generates a custom wordlist of format YYYYMMDD
+# I needed for a CTF challenge.
+#
+# TODO: make more customizable using command line arguments?
+########################################################
 year = 2020
 for month in range(10, 13):
     for day in range(1, 32):

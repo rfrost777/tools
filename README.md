@@ -66,8 +66,22 @@ Usage:
 `python3 portscan.py [-h] [--debug] <ip_address> <max_port>`
 
 
+## redirect.py
+Sets up a simple http redirect (302) using Python's own HTTPServer module.
+Useful in some CTF-Boxes. Exit using <CTRL><C>. *TODO*: Use argparse to check command line arguments.
+
+Usage:
+`python3 redirect.py <port_number> <target-url>`
+
+
+## date_gen.py
+Outputs a custom date world-list in the format YYYYMMDD to STDOUT. I needed this for a CTF and couldn't
+get it done using CRUNCH, so, there you go. Write to a file using:
+`python3 date_gen.py > my_wordlist.txt`
+
+
 ## shellcode_dropper.cpp
-A simple Win64 shellcode dropper template that tries to take an educated guess if it's run in a sandboxed environment.
-Downloads and executes a raw msfvenom tcp reverse_shell payload from a C2 server if not. I used this in the TryHackMe
+A simple Win64 shellcode dropper template that tries to take an educated guess if it's run in a sandbox environment.
+Downloads and executes a raw msfvenom tcp reverse_shell payload from a C2 server if not sandboxed. I used this in the TryHackMe
 Room: Sandbox Evasion. For educational purposes only!
 *TODO*: Add more (elaborate) sandbox checks to refine the guess.
