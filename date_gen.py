@@ -6,7 +6,14 @@
 #
 # TODO: make more customizable using command line arguments?
 ########################################################
-year = 2020
-for month in range(10, 13):
-    for day in range(1, 32):
-        print(f"{year}{month:0>2}{day:0>2}")
+
+
+def main():
+    year = 2020
+    for month in range(10, 13):
+        for day in range(1, 32):
+            print(f"{year}{month:0>2}{day:0>2}")
+
+
+if __name__ == '__main__':
+    main()
