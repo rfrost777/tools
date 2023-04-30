@@ -20,11 +20,13 @@ def test_port(ip: str, port: int, open_ports: list):
         if result == 0:
             # Port is open, so append to list...
             open_ports.append(port)
+        # Log the result. Note: For backward compatibility reasons let's not use fString notation.
         logging.debug('[i] (test_port) Result returned for port %s is %s .', port, result)
         sock.close()
     except socket.error:
         # only catching socket errors here is probably better practice!
-        logging.debug('[E] (test_port) Returned socket an error: %s .', socket.error)
+        # Log it as exception and carry on.
+        logging.exception('[E] (test_port) Returned socket an error: %s .', socket.error)
         pass
 # === EMD def test_port ===
 
@@ -37,10 +39,10 @@ def port_scan(ip_address: str, ports: range):
         test_port(ip_address, port, open_ports)
 
     if open_ports:
-        print(f"Open Ports in {ports} found: ")
+        print(f"[=O=] Open Ports in {ports} found:")
         print(sorted(open_ports))
     else:
-        print("Looks like we found no open ports :(\n")
+        print("[=X=] Looks like we found no open ports :(\n")
 # === EMD def port_scan ===
 
 
@@ -97,6 +99,8 @@ def main():
             datefmt='%d-%m-%Y %I:%M:%S'
         )
 
+    print("Simple TCP port scanner")
+    print("=================================")
     # Set up port range...
     ports: range = range(1, parsed_args.max_port)
     # ...and work the magic:
