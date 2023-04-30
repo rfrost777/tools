@@ -14,11 +14,12 @@ if len(sys.argv)-1 != 2:
 
 
 class Redirect(BaseHTTPRequestHandler):
-    def do_GET(self):
+    def do_get(self):
         # send back a 302 http-header with <url> as new location...
         self.send_response(302)
         self.send_header('Location', sys.argv[2])
         self.end_headers()
+
 
 # Redirect forever (a very long time)...
 HTTPServer(("", int(sys.argv[1])), Redirect).serve_forever()

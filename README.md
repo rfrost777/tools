@@ -59,7 +59,7 @@ Usage:
 
 ## portscan.py
 Simple TCP Portscanner that scans ports from 1 to max_port. 
-Added: --debug switch for benchmarking purposes.
+Added: --debug switch to write a logfile with more information.
 *TODO*: Make it more useful. Maybe increase efficiency?
 
 Usage:

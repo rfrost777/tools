@@ -8,6 +8,7 @@ import socket
 import argparse
 import time
 from contextlib import contextmanager
+import logging
 
 
 def test_port(ip: str, port: int, open_ports: list):
@@ -19,9 +20,11 @@ def test_port(ip: str, port: int, open_ports: list):
         if result == 0:
             # Port is open, so append to list...
             open_ports.append(port)
+        logging.debug('[i] (test_port) Result returned for port %s is %s .', port, result)
         sock.close()
     except socket.error:
         # only catching socket errors here is probably better practice!
+        logging.debug('[E] (test_port) Returned socket an error: %s .', socket.error)
         pass
 # === EMD def test_port ===
 
@@ -41,12 +44,6 @@ def port_scan(ip_address: str, ports: range):
 # === EMD def port_scan ===
 
 
-def debug():
-    # TODO: Log and output useful information if debug flag is set.
-    raise NotImplementedError('Special debug code is not yet implemented.')
-# === EMD def debug ===
-
-
 @contextmanager
 def timer():
     # Save the start time.
@@ -62,7 +59,8 @@ def timer():
 
 
 def main():
-    # Set up a parser and populate its arguments...
+    debug: bool = False
+    # Set up a commandline parser and populate its arguments...
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
         description="Simple (TCP) port scanner written in Python."
     )
@@ -80,10 +78,25 @@ def main():
         "--debug",
         action="store_true",
         dest="debug",
-        help="Print additional information useful for testing. Not yet implemented."
+        help="Write additional (debugging) information to file: portscan.log."
     )
+
     # Parse arguments.
     parsed_args: argparse.Namespace = parser.parse_args()
+
+    # If debug flag is set provide a logfile with more information:
+    if debug:
+        logging.basicConfig(
+            level=logging.DEBUG,
+            filename='portscan.log',
+            encoding='utf-8',
+            # Overwrite logfile by default. Use 'a' for append mode.
+            filemode='w',
+            # Beautify the logfile entries with custom formatting and date.
+            format='%(levelname)s (%(asctime)s: %(message)s',
+            datefmt='%d-%m-%Y %I:%M:%S'
+        )
+
     # Set up port range...
     ports: range = range(1, parsed_args.max_port)
     # ...and work the magic:
