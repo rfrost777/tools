@@ -5,8 +5,8 @@
 #   Used in the TryHackMe Room: Capture!
 #   ( https://tryhackme.com/room/capture )
 #############################################################
-import urllib.request
-from bs4 import BeautifulSoup
+# import urllib.request
+# from bs4 import BeautifulSoup
 
 # Point this to your target box:
 target_ip: str = '10.10.10.10'
@@ -35,8 +35,21 @@ def solve_captcha(captcha: str) -> int:
             raise NotImplementedError("Operator not supported (yet).")
 
 
+def load_dictionary(filename: str) -> list:
+    # Logic for loading our wordlists and converting them
+    # into lists line-by-line for easier handling later on.
+    with open(filename, 'r', encoding="utf-8") as file:
+        raw_data: str = file.read()
+    wordlist: list = raw_data.splitlines()
+    print(f"[=] Loaded wordlist {filename} for: {len(wordlist)} items.")
+    return wordlist
+
+
 if __name__ == '__main__':
     print(f"First Test: {solve_captcha('200 % 10')}, second Test: {solve_captcha('200 - 10')}.")
-    login_page = urllib.request.urlopen(f'http://{target_ip}/login')
-    print(login_page.read())
 
+    passwords: list = load_dictionary('./passwords.txt')
+    usernames: list = load_dictionary('./usernames.txt')
+    # login_page = urllib.request.urlopen(f'http://{target_ip}/login')
+    # print(login_page.read())
+    

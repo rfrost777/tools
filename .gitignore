@@ -1,2 +1,5 @@
 # ignore all logs
 *.log
+# ignore testcase text files
+passwords.txt
+usernames.txt
