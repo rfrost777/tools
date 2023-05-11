@@ -74,6 +74,11 @@ Usage:
 `python3 redirect.py <port_number> <target-url>`
 
 
+## captcha_fuzz.py
+Custom username/password fuzzing Script for a basic, Captcha-protected login page.
+Used in the TryHackMe Room: Capture! (https://tryhackme.com/room/capture)
+
+
 ## date_gen.py
 Outputs a custom date world-list in the format YYYYMMDD to STDOUT. I needed this for a CTF and couldn't
 get it done using CRUNCH, so, there you go. Write to a file using:

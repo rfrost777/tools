@@ -40,6 +40,7 @@ def load_dictionary(filename: str) -> list:
     # into lists line-by-line for easier handling later on.
     with open(filename, 'r', encoding="utf-8") as file:
         raw_data: str = file.read()
+        lst = f.readlines()
     wordlist: list = raw_data.splitlines()
     print(f"[=] Loaded wordlist {filename} for: {len(wordlist)} items.")
     return wordlist
