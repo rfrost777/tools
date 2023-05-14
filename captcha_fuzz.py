@@ -16,7 +16,7 @@ def solve_captcha(captcha: str) -> int:
     # This function calculates the actual captcha and returns the result.
     # First split the captcha string by blanks:
     components: list = captcha.split()
-    print(f"I have gotten {components} out of the string!")
+    print(f"[=] I have gotten {components} out of the string!")
     operand_one: int = int(components[0])
     operator: str = components[1]
     operand_two: int = int(components[2])
@@ -33,21 +33,22 @@ def solve_captcha(captcha: str) -> int:
         case _:
             # Catch all the remaining cases and raise an error:
             raise NotImplementedError("Operator not supported (yet).")
+# === END def solve_captcha ===
 
 
 def load_dictionary(filename: str) -> list:
     # Logic for loading our wordlists and converting them
     # into lists line-by-line for easier handling later on.
     with open(filename, 'r', encoding="utf-8") as file:
-        raw_data: str = file.read()
-        lst = f.readlines()
-    wordlist: list = raw_data.splitlines()
+        wordlist: list = file.readlines()
+
     print(f"[=] Loaded wordlist {filename} for: {len(wordlist)} items.")
     return wordlist
+# === END def load_dictionary ===
 
 
 if __name__ == '__main__':
-    print(f"First Test: {solve_captcha('200 % 10')}, second Test: {solve_captcha('200 - 10')}.")
+    print(f"[I] First Test: {solve_captcha('200 % 10')}, second Test: {solve_captcha('200 - 10')}.")
 
     passwords: list = load_dictionary('./passwords.txt')
     usernames: list = load_dictionary('./usernames.txt')
