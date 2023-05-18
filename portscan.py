@@ -8,6 +8,7 @@ import socket
 import argparse
 import time
 from contextlib import contextmanager
+from termcolor import cprint
 import logging
 
 
@@ -39,10 +40,10 @@ def port_scan(ip_address: str, ports: range):
         test_port(ip_address, port, open_ports)
 
     if open_ports:
-        print(f"[=O=] Open Ports in {ports} found:")
-        print(sorted(open_ports))
+        cprint(f"[=O=] Open Ports in {ports} found:", 'green', attrs=['dark'])
+        cprint(str(sorted(open_ports)), 'green', attrs=['bold'])
     else:
-        print("[=X=] Looks like we found no open ports :(\n")
+        cprint("[=X=] Looks like we found no open ports :(\n", 'red', attrs=['bold'])
 # === EMD def port_scan ===
 
 
@@ -56,7 +57,7 @@ def timer():
     finally:
         # Save the end time and print out the duration.
         end_time: float = time.perf_counter()
-        print(f"[=O=] Scan completed in about: {end_time - start_time:.2f} seconds.\n")
+        cprint(f"\n[=O=] Scan completed in about: {end_time - start_time:.2f} seconds.\n", 'yellow')
 # === EMD def timer ===
 
 
@@ -99,8 +100,9 @@ def main():
             datefmt='%d-%m-%Y %I:%M:%S'
         )
 
-    print("Simple TCP port scanner")
-    print("=================================")
+    print("\033c")
+    cprint(' Simple TCP port scanner', 'green', attrs=['bold'])
+    cprint("=================================", 'green')
     # Set up port range...
     ports: range = range(1, parsed_args.max_port)
     # ...and work the magic:
