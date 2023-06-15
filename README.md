@@ -86,7 +86,8 @@ get it done using CRUNCH, so, there you go. Write to a file using:
 
 
 ## shellcode_dropper.cpp
-A simple Win64 shellcode dropper template that tries to take an educated guess if it's run in a sandbox environment.
+A simple Windows shellcode dropper template that tries to take an educated guess if it's run in a sandbox environment.
 Downloads and executes a raw msfvenom tcp reverse_shell payload from a C2 server if not sandboxed. I used this in the TryHackMe
 Room: Sandbox Evasion. For educational purposes only!
 *TODO*: Add more (elaborate) sandbox checks to refine the guess.
+*ADDED*: Simple, basic anti-debugging code using SuspendThread().

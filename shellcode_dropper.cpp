@@ -11,8 +11,9 @@
 #include <Windows.h>
 #include <tlhelp32.h>
 #include <locale>
-#include <string>
+#include <string.h>
 #include <urlmon.h>
+#include <wchar.h>
 #include <cstdio>
 #include <lm.h>
 #include <DsGetDC.h>
