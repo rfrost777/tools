@@ -12,7 +12,7 @@ from termcolor import cprint
 import logging
 
 
-def test_port(ip: str, port: int, open_ports: list):
+def test_port(ip: str, port: int, open_ports: list) -> None:
     try:
         sock: socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         # Set a timeout to limit runtime on slow connections.
@@ -32,7 +32,7 @@ def test_port(ip: str, port: int, open_ports: list):
 # === EMD def test_port ===
 
 
-def port_scan(ip_address: str, ports: range):
+def port_scan(ip_address: str, ports: range) -> None:
     open_ports: list = []
     for port in ports:
         # Check all ports in range.
@@ -48,7 +48,7 @@ def port_scan(ip_address: str, ports: range):
 
 
 @contextmanager
-def timer():
+def timer() -> None:
     # Save the start time.
     start_time: float = time.perf_counter()
     try:
@@ -61,7 +61,7 @@ def timer():
 # === EMD def timer ===
 
 
-def main():
+def main() -> None:
     debug: bool = False
     # Set up a commandline parser and populate its arguments...
     parser: argparse.ArgumentParser = argparse.ArgumentParser(
