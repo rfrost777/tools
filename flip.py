@@ -16,7 +16,7 @@ import re
 # EDIT this to point at your target address once you pressed "Start Machine"
 target_ip: str = '10.10.96.249'
 
-# I copied encrypt_data() and decrypt_data() from the "leaked" sourcecode
+# I copied encrypt_data() and decrypt_data() from the "leaked" app sourcecode
 # in the downloadable challenge files:
 
 
@@ -37,7 +37,7 @@ def decrypt_data(encrypted_params: str, enc_key: bytes, i_vector: bytes) -> int:
         return 0
 
 
-def main():
+def main() -> None:
     # Generate a key and an initialization vector for AES
     key: bytes = get_random_bytes(16)
     iv: bytes = get_random_bytes(16)

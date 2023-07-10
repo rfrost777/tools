@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #########################################################################
 # Quick Python tool to decode the output of the nice netcat living at:
 # nc mercury.picoctf.net 49039 > message.txt
@@ -7,7 +8,7 @@ import sys
 import os.path
 
 
-def main():
+def main() -> None:
     if not (1 < len(sys.argv) <= 2):
         # something seems off, better print out usage and exit nonzero
         print(f"Usage: {sys.argv[0]} <filename> to decode the ASCII contents of filename.\n")

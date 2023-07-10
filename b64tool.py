@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 ##################################################
 # CLI tool for base64 en-/decoding of strings
 # using argparse is prob overkill, but anyways...
@@ -6,7 +7,7 @@ import argparse
 import base64
 
 
-def main():
+def main() -> None:
     mode = {
         "dec": "decode",
         "enc": "encode"

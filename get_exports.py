@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 ###########################################################################################
 # Write the original exports table of a WINDOWS DLL
 # to a file. Useful for PrivEsc with proxy DLL's,
@@ -16,7 +17,7 @@ import pefile
 import argparse
 
 
-def main():
+def main() -> None:
     # set up parser and populate arguments...
     parser = argparse.ArgumentParser(description='Write exports of a target DLL to a file.')
     parser.add_argument(

@@ -8,7 +8,7 @@
 ########################################################
 
 
-def main():
+def main() -> None:
     year: int = 2020
     for month in range(10, 13):
         for day in range(1, 32):

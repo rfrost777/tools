@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 ###################################################
 # Decode a ROT13 encoded string and print out its
 # content. Used for picoCTF MOD26 challenge.
@@ -43,7 +44,7 @@ def rot47elegant(phrase: str) -> str:
     return ''.join(d)
 
 
-def main():
+def main() -> None:
     if len(sys.argv) != 2:
         print(f"Usage: {sys.argv[0]} '<your text to encode or decode>'\n")
     else:
