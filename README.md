@@ -36,6 +36,19 @@ Usage:
 `ltdis.sh <binary>`
 
 
+## dvwa_bruteit.sh / dvwa_patator.sh
+Two shell scripts I improvised while attacking the webapp login page of a DVWA machine, following the THM room
+"Brute Force Heroes" (https://tryhackme.com/room/bruteforceheroes). Using ZAP and/or hydra did not work at all for me
+so I used good old curl. The command line in the Patator task seemed wrong to me too and did not work in my
+Kali 2023.2 VM, so I improved and fixed that. The provided TryHackMe DVWA used "Impossible" security level settings,
+so I had to work arround a PHP-SessionID and a Cross-Site-Request-Forgery (CSRF) token. Edit the setup section in those
+scripts to your needs and fire away.
+
+Usage:
+`./dvwa_bruteit.sh` or
+`./dvwa_patator.sh`
+
+
 ## lyrics2.rock
 A CTF challenge written in Rockstar. Yeah, I know. That's really a thing. Roll with it...
 
