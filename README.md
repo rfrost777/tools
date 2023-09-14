@@ -90,6 +90,19 @@ Usage:
 ## captcha_fuzz.py
 Custom username/password fuzzing Script for a basic, Captcha-protected login page.
 Used in the TryHackMe Room: Capture! (https://tryhackme.com/room/capture)
+*TODO*: WIP...
+
+
+## timing_exploit.py
+Timing attack exploit of a poorly designed hashing function on the login form from the THM-hackerNote Room:
+https://tryhackme.com/room/hackernote
+You can increase your success chance by adding your own username to the top of the name list
+Assumes you have at least ONE correct username, use the "create account" button for that.
+*Credit(s)*: Borrowed and improved from NinjaJc01 (James):
+https://github.com/NinjaJc01/hackerNoteExploits
+
+Usage:
+`Edit the top of the python code with <target_hostname> and your <namelist_to_use>, then fire away.`
 
 
 ## date_gen.py
