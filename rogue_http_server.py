@@ -1,7 +1,21 @@
-from http.server import SimpleHTTPRequestHandler, HTTPServer
-from urllib.parse import unquote
-# let's extent http.server:
-class CustomRequestHandler(SimpleHTTPRequestHandler):
+#!/usr/bin/env python3
+from http.server import BaseHTTPRequestHandler, HTTPServer
+# from urllib.parse import unquote
+
+
+# let's extent http.server's RequestHandler:
+class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
+    # add support for a few common MIME types...
+    extensions_map = {
+        '.manifest': 'text/cache-manifest',
+        '.html': 'text/html',
+        '.png': 'image/png',
+        '.jpg': 'image/jpg',
+        '.svg': 'image/svg+xml',
+        '.css': 'text/css',
+        '.js': 'application/x-javascript',
+        '': 'application/octet-stream',  # Default
+    }
 
     def end_headers(self):
         # allow requests from any origin:
@@ -10,12 +24,12 @@ class CustomRequestHandler(SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         super().end_headers()
 
-    def do_GET(self):
+    def do_GET(self) -> None:
         self.send_response(200)
         self.end_headers()
         self.wfile.write(b'[+] GET request captured!')
 
-    def do_POST(self):
+    def do_POST(self) -> None:
         content_length = int(self.headers['Content-Length'])
         post_data = self.rfile.read(content_length).decode('utf-8')
 
@@ -28,9 +42,16 @@ class CustomRequestHandler(SimpleHTTPRequestHandler):
         response = f'[+] POST request captured! Received data: {post_data}'
         self.wfile.write(response.encode('utf-8'))
 
+
 if __name__ == '__main__':
     server_address = ('', 8080)
-    httpd = HTTPServer(server_address, CustomRequestHandler)
-    print('[i] Rogue HTTP server started on: http://localhost:8080/')
-    # run forever (a very long time):
-    httpd.serve_forever()
+    httpd = HTTPServer(server_address, SimpleHTTPRequestHandler)
+    print(f'[i] Rogue HTTP server started on port {server_address[1]}...')
+    try:
+        # run forever (a very long time):
+        httpd.serve_forever()
+    except KeyboardInterrupt:
+        pass
+    # maybe not that long, after all...
+    httpd.server_close()
+    print('[i] Rogue HTTP server stopped.')
