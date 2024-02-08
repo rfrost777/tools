@@ -3,9 +3,11 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 # from urllib.parse import unquote
 
 
-# let's extent http.server's RequestHandler:
+# On a second thought: this _might_ not be the ideal way to go about this, as I think
+# this actually overwrites HTTPRequestHandler instead of overloading its methods...
+# at least it works, so lets extent http.server's RequestHandler:
 class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
-    # add support for a few common MIME types...
+    # add support for a few basic MIME types in case we need them down the road...
     extensions_map = {
         '.manifest': 'text/cache-manifest',
         '.html': 'text/html',
