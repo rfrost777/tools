@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
+#############################################################################
+# Extended http.server module to capture post requests from indirect (blind)
+# SSRF attacks and so on...
+#############################################################################
 from http.server import BaseHTTPRequestHandler, HTTPServer
+# debug:
 # from urllib.parse import unquote
 
 
@@ -20,7 +25,7 @@ class SimpleHTTPRequestHandler(BaseHTTPRequestHandler):
     }
 
     def end_headers(self):
-        # allow requests from any origin:
+        # set headers to allow requests from any origin:
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')

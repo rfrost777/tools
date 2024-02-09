@@ -18,6 +18,17 @@ CyberChef in my browser... and I really needed this one string decoded!
 Usage:
 `python3 b64tool.py [-h] [--urlsafe] {dec,enc} <inputstring>`
 
+## ntlm_passwordspray.py
+A simple Password sprayer for NTLM (web-)endpoints.
+I used this to throw a company standard password at enumerated user accounts on a NTLM weblogin endpoint to where it sticks. Aka what users did not change their
+default credentials as they were told to do...
+You _could_ use hydra for this, but this way I had more control over the process,
+as hydra tends to make alot of noise.
+*TODO* Switch from getopt to argparse for a less redundant options handling?
+
+Usage:
+`ntlm_passwordspray.py -u <enumerated_userfile> -f <fqdn> -p <std_password> -a <attackurl>`
+
 
 ## get_exports.py / proxy.c
 Rips the export table from a WINDOWS DLL and dumps it to a file. Used for WINDOWS PrivEsc via
@@ -117,3 +128,9 @@ Downloads and executes a raw msfvenom tcp reverse_shell payload from a C2 server
 Room: Sandbox Evasion. For educational purposes only!
 *TODO*: Add more (elaborate) sandbox checks to refine the guess.
 *ADDED*: Simple, basic anti-debugging code using SuspendThread().
+
+## rogue_http_server.py
+Extended python http.server module to capture (and save) post requests from indirect (blind)
+SSRF attacks and so on...
+*TODO*: It works as-is, but I coded it like a caveman (method overloading in python, bruah?).
+Add more nifty features I might need in the future.
