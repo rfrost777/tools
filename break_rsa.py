@@ -1,4 +1,4 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
 #######################################################
 # Breaking (weak) RSA implementations
 # Room: https://tryhackme.com/room/breakrsa
@@ -10,22 +10,23 @@
 from gmpy2 import isqrt
 from math import lcm
 from Crypto.PublicKey import RSA
-# from base64 import b64decode
+
 
 # Helper function to find the Greatest Common Divisor (GCD)
 # using the Euclidean Algorithm:
 def euclidean_gcd(a, b):
     if a == 0:
-        return (b, 0, 1)
-    g, y, x = egcd(b%a,a)
-    return (g, x - (b//a) * y, y)
+        return b, 0, 1
+    g, y, x = euclidean_gcd(b % a, a)
+    return g, x - (b//a) * y, y
 
-# Think of this like division of sorts, but for modular arithmetic ;-)...
+
+# Think of this like a division of sorts, but for modular arithmetic ;-)...
 def modular_inverse(a, m):
     g, x, y = euclidean_gcd(a, m)
     if g != 1:
         raise Exception('Uh-ohh! There is no modular inverse!')
-    return x%m
+    return x % m
 
 
 # Python implementation of the original algorithm
@@ -35,12 +36,12 @@ def fermat_factorize(n):
     # First check if n is even. Since even numbers are per definitionem divisible by 2, one of the factors will
     # always be 2!
     if (n & 1) == 0:
-        return (n/2, 2)
+        return n/2, 2
 
     # Calculate the integer square root of n
     a = isqrt(n)
 
-    # Low hanging fruit: If n is a perfect square (n = a^2) the factors will be ( sqrt(n), sqrt(n) )
+    # Low-hanging fruit: If n is a perfect square (n = a^2) the factors will be ( sqrt(n), sqrt(n) )
     if a * a == n:
         return a, a
 
@@ -56,12 +57,12 @@ def fermat_factorize(n):
 
 # import our given, weak public key:
 key = open('./id_rsa.pub', "rb").read()
-rsakey = RSA.importKey(key)
+rsa_key = RSA.importKey(key)
 
-print(f'{rsakey}\n')
-print(f'Size in bits is: {rsakey.size_in_bits()}\n')
+print(f'{rsa_key}\n')
+print(f'Size in bits is: {rsa_key.size_in_bits()}\n')
 
-(p, q) = (fermat_factorize(rsakey.n))
+(p, q) = (fermat_factorize(rsa_key.n))
 
 print(f'Difference between p and q: {abs(p - q)}\n')
 print(f'Prime factor p:\n{p}\n\n')
