@@ -10,6 +10,7 @@
 from gmpy2 import isqrt
 from math import lcm
 from Crypto.PublicKey import RSA
+import os
 
 
 # Helper function to find the Greatest Common Divisor (GCD)
@@ -46,6 +47,7 @@ def fermat_factorize(n):
         return a, a
 
     while True:
+        # Okay, no more shortcuts, let's get to work:
         a = a + 1
         bsq = a * a - n
         b = isqrt(bsq)
@@ -55,24 +57,24 @@ def fermat_factorize(n):
     return a + b, a - b
 
 
-# import our given, weak public key:
-key = open('./id_rsa.pub', "rb").read()
+# load our given, weak public key:
+with open(os.path.expanduser('~/id_rsa.pub'), 'rb') as public_key_file:
+    key = public_key_file.read()
+# ...and let the pycryptodom.rsa object take care of the key specifics:
 rsa_key = RSA.importKey(key)
-
-print(f'{rsa_key}\n')
+print('\nPublic key loaded!\n')
+print(f'Given e in public key: {rsa_key.e}\n')
 print(f'Size in bits is: {rsa_key.size_in_bits()}\n')
 
 (p, q) = (fermat_factorize(rsa_key.n))
 
-print(f'Difference between p and q: {abs(p - q)}\n')
+print(f'Numerical difference between p and q: {abs(p - q)}\n')
 print(f'Prime factor p:\n{p}\n\n')
 print(f'Prime factor q:\n{q}\n\n')
-print(f'Given n was:\n{p*q}\n\n')
+print(f'Given n was:\n{rsa_key.n}\n\n')
 
-# Set RSA default for e:
-e = 65537
-
-# Calculate the private exponent d:
-d = modular_inverse(e, lcm(p - 1, q - 1))
+# RSA default for e is 65537,
+# calculate the private exponent d:
+d = modular_inverse(rsa_key.e, lcm(p - 1, q - 1))
 
 print(f'Private exponent d is:\n{d}')
