@@ -61,26 +61,31 @@ def fermat_factorize(n: Any) -> tuple[Any, Any]:
     return a + b, a - b
 
 
-# Load our given, weak public key:
-key: bytes
-with open(os.path.expanduser(file_path), 'rb') as public_key_file:
-    key = public_key_file.read()
-print(f'\nLoaded {file_path} for {len(key)} bytes of content!\n')
-# ...and let the pycryptodom.rsa object take care of the key implementation specifics:
-rsa_key = RSA.importKey(key)
+def main() -> None:
+    # Load our given, weak public key:
+    key: bytes
+    with open(os.path.expanduser(file_path), 'rb') as public_key_file:
+        key = public_key_file.read()
+    print(f'\nLoaded {file_path} for {len(key)} bytes of content!\n')
+    # ...and let the pycryptodom.rsa object take care of the key implementation specifics:
+    rsa_key = RSA.importKey(key)
 
-print(f'Given e in public key: {rsa_key.e}\n')
-print(f'Size (complexity) of the key in bits: {rsa_key.size_in_bits()}\n')
+    print(f'Given e in public key: {rsa_key.e}\n')
+    print(f'Size (complexity) of the key in bits: {rsa_key.size_in_bits()}\n')
 
-(p, q) = (fermat_factorize(rsa_key.n))
+    (p, q) = (fermat_factorize(rsa_key.n))
 
-print(f'Numerical difference between p and q: {abs(p - q)}\n')
-print(f'Prime factor p:\n{p}\n\n')
-print(f'Prime factor q:\n{q}\n\n')
-print(f'Given n was:\n{rsa_key.n}\n\n')
+    print(f'Numerical difference between p and q: {abs(p - q)}\n')
+    print(f'Prime factor p:\n{p}\n\n')
+    print(f'Prime factor q:\n{q}\n\n')
+    print(f'Given n was:\n{rsa_key.n}\n\n')
 
-# RSA default for e is 65537,
-# calculate the private exponent d:
-d = modular_inverse(rsa_key.e, lcm(p - 1, q - 1))
+    # RSA default for e is 65537,
+    # calculate the private exponent d:
+    d = modular_inverse(rsa_key.e, lcm(p - 1, q - 1))
 
-print(f'Private exponent d is:\n{d}')
+    print(f'Private exponent d is:\n{d}')
+
+
+if __name__ == '__main__':
+    main()
