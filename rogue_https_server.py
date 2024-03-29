@@ -25,7 +25,8 @@ if __name__ == '__main__':
     )
     httpd.socket = ssl_context.wrap_socket(httpd.socket, server_side=True)
 
-    print(f'[i] Rogue HTTPS server started on port: {DEFAULT_PORT}...')
+    socket_info = httpd.socket.getsockname()
+    print(f'[i] Rogue HTTPS server started on {socket_info[0]}, port: {socket_info[1]}...')
     try:
         # run forever (a very long time!):
         httpd.serve_forever()
