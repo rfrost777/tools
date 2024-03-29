@@ -18,9 +18,10 @@ if __name__ == '__main__':
     # get the SSL socket wrapper ready, :
     ssl_context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     ssl_context.check_hostname = False  # Or else only the hostname that matches the certificate will be accepted!
+    # load our throw-away certificate and private keyfile we generated above:
     ssl_context.load_cert_chain(
-        certfile='/home/tberrang/cert.pem',
-        keyfile="/home/tberrang/key.pem"
+        certfile='cert.pem',
+        keyfile='key.pem'
     )
     httpd.socket = ssl_context.wrap_socket(httpd.socket, server_side=True)
 
