@@ -67,7 +67,7 @@ def main() -> None:
     with open(os.path.expanduser(file_path), 'rb') as public_key_file:
         key = public_key_file.read()
     print(f'\nLoaded {file_path} for {len(key)} bytes of content!\n')
-    # ...and let the pycryptodom.rsa object take care of the key implementation specifics:
+    # ...and let the PyCryptodome.rsa object take care of the key implementation specifics:
     rsa_key = RSA.importKey(key)
 
     print(f'Given e in public key: {rsa_key.e}\n')

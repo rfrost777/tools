@@ -7,7 +7,7 @@
 #
 ##########################################################
 from Crypto.Cipher import AES
-from Crypto.Util.Padding import pad,unpad
+from Crypto.Util.Padding import pad, unpad
 from Crypto.Random import get_random_bytes
 from binascii import unhexlify
 from pwn import *
@@ -21,7 +21,7 @@ target_ip: str = '10.10.96.249'
 
 
 def encrypt_data(unencrypted_params: str, enc_key: bytes, i_vector: bytes) -> str:
-    padded = pad(unencrypted_params.encode(),16,style='pkcs7')
+    padded = pad(unencrypted_params.encode(), 16, style='pkcs7')
     cipher = AES.new(enc_key, AES.MODE_CBC, i_vector)
     enc = cipher.encrypt(padded)
     return enc.hex()
@@ -31,7 +31,7 @@ def decrypt_data(encrypted_params: str, enc_key: bytes, i_vector: bytes) -> int:
     cipher = AES.new(enc_key, AES.MODE_CBC, i_vector)
     padded_params = cipher.decrypt(unhexlify(encrypted_params))
     print(padded_params)
-    if b'admin&password=sUp3rPaSs1' in unpad(padded_params,16,style='pkcs7'):
+    if b'admin&password=sUp3rPaSs1' in unpad(padded_params, 16, style='pkcs7'):
         return 1
     else:
         return 0
@@ -46,7 +46,7 @@ def main() -> None:
     # Flip one "s" in password to "r"
     user: str = 'admin&parsword=sUp3rPaSs1'
     password: str = 'sUp3rPaSs1'
-    msg: str = 'logged_username=' + user +'&password=' + password
+    msg: str = 'logged_username=' + user + '&password=' + password
     print(msg, len(msg))
 
     xor: int = ord('r') ^ ord('s')
