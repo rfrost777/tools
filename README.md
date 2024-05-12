@@ -1,5 +1,5 @@
 # Tools
-Assorted tools I wrote for CTF's, pen-testing or as a pastime of sorts.
+Assorted tools I wrote for CTF's, pen-testing or as a ~~pastime~~ learning experience of sorts.
 
 
 ## asciidc.py
@@ -11,12 +11,21 @@ Usage:
 `python3 asciidc.py <filename>`
 
 
+## break_rsa.py
+Quick-and-dirty tool used to break (weak) RSA implementations (read: primes p and q are too close to one
+another and not selected randomly) as shown in TryHackMe Room: https://tryhackme.com/room/breakrsa
+
+Usage:
+`python3 break_rsa.py <filename>`
+
+
 ## b64tool.py
 Encodes/decodes strings Base64, normal and url-safe. Wrote this because I was too lazy to pull up
 CyberChef in my browser... and I really needed this one string decoded!
 
 Usage:
 `python3 b64tool.py [-h] [--urlsafe] {dec,enc} <inputstring>`
+
 
 ## ntlm_passwordspray.py
 A simple Password sprayer for NTLM (web-)endpoints.
@@ -129,8 +138,10 @@ Room: Sandbox Evasion. For educational purposes only!
 *TODO*: Add more (elaborate) sandbox checks to refine the guess.
 *ADDED*: Simple, basic anti-debugging code using SuspendThread().
 
-## rogue_http_server.py
+
+## rogue_http_server.py / rogue_https_server.py
 Extended python http.server module to capture (and save) post requests from indirect (blind)
 SSRF attacks and so on...
+HTTP and selfsigned-HTTPS version for enhanced OpSec. 
 *TODO*: It works as-is, but I coded it like a caveman (method overloading in python, bruah?).
 Add more nifty features I might need in the future.
