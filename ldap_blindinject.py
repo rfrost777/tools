@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 #############################################################
 #   Quick and simple Web-LDAP blind injection script...
 #
@@ -7,12 +8,12 @@
 import requests
 from bs4 import BeautifulSoup
 import string
-import time
+# import time
 
 # URL to target, ex: 'http://insecure-website.com/injectme.php'
 target_url: str = 'http://10.10.233.217/blind.php'
 
-# Define the character set used fpr injection:
+# Define the character set used for injection:
 char_set = string.ascii_lowercase + string.ascii_uppercase + string.digits + "._!@#$%^&*()"
 
 # Initialize variables
