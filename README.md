@@ -32,12 +32,19 @@ A simple Password sprayer for NTLM (web-)endpoints.
 I used this to throw a company standard password at enumerated user accounts on a NTLM weblogin endpoint to where it sticks. Aka what users did not change their
 default credentials as they were told to do...
 You _could_ use hydra for this, but this way I had more control over the process,
-as hydra tends to make alot of noise.
-*TODO* Switch from getopt to argparse for a less redundant options handling?
+as hydra tends to make alot of noise.<br>
+*TODO*: Switch from getopt to argparse for a less redundant options handling?
 
 Usage:
 `ntlm_passwordspray.py -u <enumerated_userfile> -f <fqdn> -p <std_password> -a <attackurl>`
 
+
+## ldap_blindinject.py
+Quick and simple blind injection script for LDAP web logins...<br>
+*TODO*: Add CLI, colors and improve code quality.
+
+Usage:
+`python3 ldap_blindinject.py`
 
 ## get_exports.py / proxy.c
 Rips the export table from a WINDOWS DLL and dumps it to a file. Used for WINDOWS PrivEsc via
@@ -101,7 +108,8 @@ Usage:
 
 ## redirect.py
 Sets up a simple http redirect (302) using Python's own HTTPServer module.
-Useful in some CTF-Boxes. Exit using <CTRL><C>. *TODO*: Use argparse to check command line arguments.
+Useful in some CTF-Boxes. Exit using <CTRL><C>.<br>
+*TODO*: Use argparse to check command line arguments.
 
 Usage:
 `python3 redirect.py <port_number> <target-url>`
@@ -109,15 +117,15 @@ Usage:
 
 ## captcha_fuzz.py
 Custom username/password fuzzing Script for a basic, Captcha-protected login page.
-Used in the TryHackMe Room: Capture! (https://tryhackme.com/room/capture)
-*TODO*: WIP...
+Used in the TryHackMe Room: Capture! (https://tryhackme.com/room/capture)<br>
+*TODO*: _still_ WIP, dooh...
 
 
 ## timing_exploit.py
 Timing attack exploit of a poorly designed hashing function on the login form from the THM-hackerNote Room:
 https://tryhackme.com/room/hackernote
 You can increase your success chance by adding your own username to the top of the name list
-Assumes you have at least ONE correct username, use the "create account" button for that.
+Assumes you have at least ONE correct username, use the "create account" button for that.<br>
 *Credit(s)*: Borrowed and improved from NinjaJc01 (James):
 https://github.com/NinjaJc01/hackerNoteExploits
 
