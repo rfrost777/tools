@@ -1,6 +1,7 @@
+#!/usr/bin/env python3
 #################################################################################
 #
-#   Calculate a SMB3 random Session Key from PCAP data to decrypt SMB3 trafic.
+#   Calculate a random Session Key from PCAP data to decrypt SMB3 traffic.
 #   TryHackMe Room "BLOCK": https://tryhackme.com/r/room/blockroom
 #
 #   Idea stolen from Khris Tolbert: 
@@ -9,6 +10,7 @@
 #################################################################################
 import hashlib
 import hmac
+import sys
 import argparse
 from Cryptodome.Cipher import ARC4
 from Cryptodome.Cipher import DES
@@ -29,11 +31,11 @@ parser.add_argument("-hsh","--hash",required=True,help="User's NTLM Hash")
 parser.add_argument("-n","--ntproofstr",required=True,help="NTProofString. This can be found in PCAP (provide Hex Stream)")
 parser.add_argument("-k","--key",required=True,help="Encrypted Session Key. This can be found in PCAP (provide Hex Stream)")
 parser.add_argument("-v", "--verbose", action="store_true", help="Increase output verbosity")
-
 args = parser.parse_args()
+
 # Check if both --hash and --password are used...
 if args.password and args.hash:
-    print "The use of -hsh and -p are mutually exclusive ..."
+    print("The use of -hsh and -p are mutually exclusive ...")
     sys.exit(2)
 
 # Upper Case User and Domain
