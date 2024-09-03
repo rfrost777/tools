@@ -10,67 +10,76 @@
 #################################################################################
 import hashlib
 import hmac
-import sys
 import argparse
 from Cryptodome.Cipher import ARC4
-from Cryptodome.Cipher import DES
 from Cryptodome.Hash import MD4
 
-def generateEncryptedSessionKey(keyExchangeKey, exportedSessionKey):
-   cipher = ARC4.new(keyExchangeKey)
-   cipher_encrypt = cipher.encrypt
+def calculate_ntlm_hash(password: str) -> bytes:
+    passw = password.encode('utf-16le')
+    return hashlib.new('md4', passw).digest()
 
-   sessionKey = cipher_encrypt(exportedSessionKey)
-   return sessionKey
+def calculate_response_nt_key(password_hash: bytes, user: bytes, domain: bytes) -> bytes:
+    h = hmac.new(password_hash, digestmod=hashlib.md5)
+    h.update(user + domain)
+    return h.digest()
 
-parser = argparse.ArgumentParser(description="Calculate the Random Session Key based on data from a PCAP.")
-parser.add_argument("-u","--user",required=True,help="User name")
-parser.add_argument("-d","--domain",required=True, help="Domain name")
-parser.add_argument("-p","--password",required=True,help="Password of User")
-parser.add_argument("-hsh","--hash",required=True,help="User's NTLM Hash")
-parser.add_argument("-n","--ntproofstr",required=True,help="NTProofString. This can be found in PCAP (provide Hex Stream)")
-parser.add_argument("-k","--key",required=True,help="Encrypted Session Key. This can be found in PCAP (provide Hex Stream)")
-parser.add_argument("-v", "--verbose", action="store_true", help="Increase output verbosity")
-args = parser.parse_args()
+def calculate_key_exchange_key(response_nt_key: bytes, nt_proof_str: bytes) -> bytes:
+    h = hmac.new(response_nt_key, digestmod=hashlib.md5)
+    h.update(nt_proof_str)
+    return h.digest()
 
-# Check if both --hash and --password are used...
-if args.password and args.hash:
-    print("The use of -hsh and -p are mutually exclusive ...")
-    sys.exit(2)
+def generate_encrypted_session_key(key_exchange_key: bytes, exported_session_key: bytes) -> bytes:
+    cipher = ARC4.new(key_exchange_key)
+    return cipher.encrypt(exported_session_key)
 
-# Upper Case User and Domain
-user = str(args.user).upper().encode('utf-16le')
-domain = str(args.domain).upper().encode('utf-16le')
+def parse_arguments():
+    parser = argparse.ArgumentParser(description="Calculate the SMB3 Random Session Key based on data from a PCAP.")
 
-# Create 'NTLM' Hash of password
-if args.password:
-    # Create 'NTLM' Hash of password
-    passw = args.password.encode('utf-16le')
-    hash1 = hashlib.new('md4', passw)
-    password = hash1.digest()
-else:
-    # Directly use the provided NTLM Hash
-    password = bytes.fromhex(args.hash)
+    # Use a password OR a ntlm hash, whatever is handy.
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-p", "--password", help="Password of User")
+    group.add_argument("-H", "--hash", help="NTLM Hash of the password (provide Hex Stream)")
 
-# Calculate the ResponseNTKey
-h = hmac.new(password, digestmod=hashlib.md5)
-h.update(user+domain)
-respNTKey = h.digest()
+    parser.add_argument("-u", "--user", required=True, help="User name")
+    parser.add_argument("-d", "--domain", required=True, help="Domain name")
+    parser.add_argument("-n", "--ntproofstr", required=True, help="NTProofStr. This can be found in PCAP (provide Hex Stream)")
+    parser.add_argument("-k", "--key", required=True, help="Encrypted Session Key. This can be found in PCAP (provide Hex Stream)")
+    parser.add_argument("-v", "--verbose", action="store_true", help="Increase output verbosity")
 
-# Use NTProofSTR and ResponseNTKey to calculate Key Exchange Key
-NTproofStr = bytes.fromhex(args.ntproofstr)
-h = hmac.new(respNTKey, digestmod=hashlib.md5)
-h.update(NTproofStr)
-KeyExchKey = h.digest()
+    return parser.parse_args()
 
-# Calculate the Random Session Key by decrypting Encrypted Session Key with Key Exchange Key via RC4
-RsessKey = generateEncryptedSessionKey(KeyExchKey, bytes.fromhex(args.key))
+def main():
+    args = parse_arguments()
 
-if args.verbose:
-    print("USER WORK: " + user.decode('utf-16le') + "" + domain.decode('utf-16le'))
-    print("PASS HASH: " + password.hex())
-    print("RESP NT:   " + respNTKey.hex())
-    print("NT PROOF:  " + NTproofStr.hex())
-    print("KeyExKey:  " + KeyExchKey.hex())
-print("Random Session Key: " + RsessKey.hex())
+    user = args.user.upper().encode('utf-16le')
+    domain = args.domain.upper().encode('utf-16le')
 
+    if args.password:
+        # If password is given, calculate the corresponding ntlm hash first:
+        password_hash = calculate_ntlm_hash(args.password)
+    else:
+        # If we can find the hash, or it's not feasible to crack the nt password, then use the hash directly:
+        password_hash = bytes.fromhex(args.hash)
+
+    response_nt_key = calculate_response_nt_key(password_hash, user, domain)
+
+    nt_proof_str = bytes.fromhex(args.ntproofstr)
+    key_exchange_key = calculate_key_exchange_key(response_nt_key, nt_proof_str)
+
+    exported_session_key = bytes.fromhex(args.key)
+    random_session_key = generate_encrypted_session_key(key_exchange_key, exported_session_key)
+
+    if args.verbose:
+        # If verbose is set then give more (useful) context:
+        print(f"[-] USER: {user.decode('utf-16le')}")
+        print(f"[-] DOMAIN: {domain.decode('utf-16le')}")
+        print(f"[-] PASSWORD HASH: {password_hash.hex()}")
+        print(f"[-] RESPONSE NT KEY: {response_nt_key.hex()}")
+        print(f"[-]NT PROOF STR: {nt_proof_str.hex()}")
+        print(f"KEY EXCHANGE KEY: {key_exchange_key.hex()}")
+
+    # Print out what we came for...
+    print(f"[+] RANDOM SESSION KEY is: {random_session_key.hex()}")
+
+if __name__ == "__main__":
+    main()
