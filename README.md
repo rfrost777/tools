@@ -46,6 +46,14 @@ Quick and simple blind injection script for LDAP web logins...<br>
 Usage:
 `python3 ldap_blindinject.py`
 
+## sk_calc.py
+Calculate a random Session Key from PCAP data to decrypt SMB3 traffic in WireShark.
+TryHackMe Room "BLOCK": https://tryhackme.com/r/room/blockroom .
+Add -v flag for more verbose (debug) output...
+
+Usage:
+`python3 sk_calc.py [-p 'user_password OR -H 'ntlm_hash'] -u 'user_name' -d 'domain_name' -n 'nt_proof_string' -k 'encrypted_sessionkey'`
+
 ## get_exports.py / proxy.c
 Rips the export table from a WINDOWS DLL and dumps it to a file. Used for WINDOWS PrivEsc via
 proxy DLL (use the code in proxy.c as a simple example). See resp. comments in those files for more info.
