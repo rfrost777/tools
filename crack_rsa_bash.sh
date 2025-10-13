@@ -1,0 +1,82 @@
+#!/bin/bash
+
+# PoC: Minimal Fermat's factorization + RSA decrypt in Bash + bc
+# I wondered if you could attack a weak RSA encryption while only using bash...
+# turn out: you can! Is it efficient? F++king hell, NO!
+# For your own sanity use more optimized tools like C librarys or Python with NumPy etc.
+# But you _can_ use this aproach if in a pinch... :)
+
+# Given a weak n and c
+n=15956250162063169819282947443743274370048643274416742655348817823973383829364700573954709256391245826513107784713930378963551647706777479778285473302665664446406061485616884195924631582130633137574953293367927991283669562895956699807156958071540818023122362163066253240925121801013767660074748021238790391454429710804497432783852601549399523002968004989537717283440868312648042676103745061431799927120153523260328285953425136675794192604406865878795209326998767174918642599709728617452705492122243853548109914399185369813289827342294084203933615645390728890698153490318636544474714700796569746488209438597446475170891
+
+c=3591116664311986976882299385598135447435246460706500887241769555088416359682787844532414943573794993699976035504884662834956846849863199643104254423886040489307177240200877443325036469020737734735252009890203860703565467027494906178455257487560902599823364571072627673274663460167258994444999732164163413069705603918912918029341906731249618390560631294516460072060282096338188363218018310558256333502075481132593474784272529318141983016684762611853350058135420177436511646593703541994904632405891675848987355444490338162636360806437862679321612136147437578799696630631933277767263530526354532898655937702383789647510
+
+e=65537
+
+# Fermat factorization in bc (slow but works if p ~ q)
+bc -l <<EOF > factors.txt
+define isqrt(x) {
+    if (x<0) return -1
+    scale=0
+    a = x/2
+    b = (a + x/a)/2
+    while (a != b) {
+        a = b
+        b = (a + x/a)/2
+    }
+    return a
+}
+n=$n
+a = isqrt(n)
+if (a * a < n) a += 1
+while (1) {
+    b2 = a^2 - n
+    b = isqrt(b2)
+    if (b^2 == b2) {
+        p = a - b
+        q = a + b
+        print "p=", p, "\n"
+        print "q=", q, "\n"
+        break
+    }
+    a += 1
+}
+quit
+EOF
+
+source <(grep '=' factors.txt)
+
+# Calculate phi, d and decrypt c using bc
+bc -l <<EOF > decrypted.txt
+define modinv(a, m) {
+    for (x = 1; x < m; x++) {
+        if ((a * x) % m == 1) return x
+    }
+    return -1
+}
+define powmod(b, e, m) {
+    r = 1
+    while (e > 0) {
+        if (e % 2 == 1) r = (r * b) % m
+        b = (b * b) % m
+        e /= 2
+    }
+    return r
+}
+
+p=$p
+q=$q
+e=$e
+c=$c
+n=p*q
+phi=(p-1)*(q-1)
+d=modinv(e, phi)
+m=powmod(c, d, n)
+print m, "\n"
+quit
+EOF
+
+# Convert long integer to hex → bytes → printable text
+plaintext=$(cat decrypted.txt | tr -d '\n' | awk '{ printf "%x", $1 }' | xxd -r -p)
+
+echo "[+] Decrypted flag: $plaintext"
